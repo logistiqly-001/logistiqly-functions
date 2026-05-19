@@ -15,10 +15,11 @@ exports.handler = async function(event) {
   const action = params.action;
 
   try {
-    // Autocomplete
+    // Autocomplete with Knoxville TN location bias
     if (action === "autocomplete") {
       const input = params.input || "";
-      const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&types=address&components=country:us&key=${API_KEY}`;
+      // Knoxville TN coordinates: 35.9606, -83.9207 — bias radius 80km covers East Tennessee
+      const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&types=address&components=country:us&location=35.9606,-83.9207&radius=80000&strictbounds=false&key=${API_KEY}`;
       const res = await fetch(url);
       const data = await res.json();
       return { statusCode: 200, headers, body: JSON.stringify(data) };
