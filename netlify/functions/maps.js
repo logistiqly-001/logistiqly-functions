@@ -15,11 +15,21 @@ exports.handler = async function(event) {
   const action = params.action;
 
   try {
-    // Autocomplete with Knoxville TN location bias
+    // Autocomplete with dynamic location bias from pickup address
     if (action === "autocomplete") {
       const input = params.input || "";
-      // Knoxville TN coordinates: 35.9606, -83.9207 — bias radius 80km covers East Tennessee
-      const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&types=address&components=country:us&location=35.9606,-83.9207&radius=80000&strictbounds=false&key=${API_KEY}`;
+      const lat = params.lat || "35.9606";
+      const lng = params.lng || "-83.9207";
+      const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&types=address&components=country:us&location=${lat},${lng}&radius=80000&strictbounds=false&key=${API_KEY}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      return { statusCode: 200, headers, body: JSON.stringify(data) };
+    }
+
+    // Geocode an address to get lat/lng coordinates
+    if (action === "geocode") {
+      const address = params.address || "";
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${API_KEY}`;
       const res = await fetch(url);
       const data = await res.json();
       return { statusCode: 200, headers, body: JSON.stringify(data) };
